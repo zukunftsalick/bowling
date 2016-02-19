@@ -8,25 +8,35 @@ class Bowling
   end
 
   def score
-    sum = 0
-    number_of_rolls.times do
+    number_of_rolls.times.inject(0) do |sum|
       if strike?
-        sum += STRIKE_POINTS + next_two_rolls_points
-        @current_roll_index += 1
+        sum += calculate_strike_points
       elsif spare?
-        sum += SPARE_POINTS + next_roll_points
-        @current_roll_index += 2
+        sum += calculate_spare_points
       else
         sum += knocked_down_pins_points
-        @current_roll_index += 2
       end
     end
-    sum
   end
 
-private
-  def knocked_down_pins_points
-    @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i
+  private
+
+  def calculate_spare_points
+    points = SPARE_POINTS + next_roll_points
+    @current_roll_index += 2
+    points
+  end
+
+  def calculate_strike_points
+    points = STRIKE_POINTS + next_two_rolls_points
+    @current_roll_index += 1
+    points
+  end
+
+  def knocked_down_pins_points(change_index: true)
+    points = @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i
+    @current_roll_index += 2 if change_index
+    points
   end
 
   def next_two_rolls_points
@@ -42,11 +52,10 @@ private
   end
 
   def spare?
-    knocked_down_pins_points == SPARE_POINTS
+    knocked_down_pins_points(change_index: false) == SPARE_POINTS
   end
 
   def number_of_rolls
     @rolls.take(MAX_NUM_OF_FRAMES).size
   end
-
 end
