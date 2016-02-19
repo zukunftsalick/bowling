@@ -1,5 +1,6 @@
 class Bowling
   NUM_OF_FRAMES = 10
+  MAX_FRAME_POINTS = 10
   attr_accessor :rolls
 
   def initialize
@@ -9,12 +10,12 @@ class Bowling
   def score
     sum = 0
 
-    game_rolls.each do
+    number_of_rolls.times do
       if strike?
-        sum += 10 + @rolls[@current_roll_index + 1].to_i + @rolls[@current_roll_index + 2].to_i
+        sum += MAX_FRAME_POINTS + @rolls[@current_roll_index + 1].to_i + @rolls[@current_roll_index + 2].to_i
         @current_roll_index += 1
-      elsif @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i == 10
-        sum += 10 + @rolls[@current_roll_index + 2].to_i
+      elsif spare?
+        sum += MAX_FRAME_POINTS + @rolls[@current_roll_index + 2].to_i
         @current_roll_index += 2
       else
         sum += @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i
@@ -26,11 +27,15 @@ class Bowling
 
 private
   def strike?
-    @rolls[@current_roll_index] == 10
+    @rolls[@current_roll_index] == MAX_FRAME_POINTS
   end
 
-  def game_rolls
-    @rolls.take(NUM_OF_FRAMES)
+  def spare?
+    @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i == MAX_FRAME_POINTS
+  end
+
+  def number_of_rolls
+    @rolls.take(NUM_OF_FRAMES).size
   end
 
 end
