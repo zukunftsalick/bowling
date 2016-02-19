@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Bowling do
   subject { Bowling.new }
   describe '#score' do
+    it 'returns 0 for no rolls' do
+  		expect(subject.score).to eql 0
+    end
+
     it 'returns 0 for no pins' do
       subject.rolls = [0, 0, 0, 0]
   		expect(subject.score).to eql 0
@@ -18,7 +22,7 @@ describe Bowling do
   		expect(subject.score).to eql 22
   	end
 
-    it 'returns 22 with one strike' do
+    it 'returns 22 with one strike and incomplete set of rolls' do
       subject.rolls = [10, 5, 1]
   		expect(subject.score).to eql 22
   	end

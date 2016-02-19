@@ -4,6 +4,7 @@ class Bowling
 
   def initialize
     @current_roll_index = 0
+    @rolls = []
   end
 
   def score
