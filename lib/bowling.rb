@@ -1,6 +1,5 @@
 class Bowling
-  NUM_OF_FRAMES = 10
-  MAX_FRAME_POINTS = 10
+  MAX_NUM_OF_FRAMES = MAX_POINTS_PER_FRAME = SPARE_POINTS = STRIKE_POINTS = 10
   attr_accessor :rolls
 
   def initialize
@@ -9,16 +8,15 @@ class Bowling
 
   def score
     sum = 0
-
     number_of_rolls.times do
       if strike?
-        sum += MAX_FRAME_POINTS + @rolls[@current_roll_index + 1].to_i + @rolls[@current_roll_index + 2].to_i
+        sum += STRIKE_POINTS + next_two_rolls_points
         @current_roll_index += 1
       elsif spare?
-        sum += MAX_FRAME_POINTS + @rolls[@current_roll_index + 2].to_i
+        sum += SPARE_POINTS + next_roll_points
         @current_roll_index += 2
       else
-        sum += @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i
+        sum += knocked_down_pins_points
         @current_roll_index += 2
       end
     end
@@ -26,16 +24,28 @@ class Bowling
   end
 
 private
+  def knocked_down_pins_points
+    @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i
+  end
+
+  def next_two_rolls_points
+    @rolls[@current_roll_index + 1].to_i + @rolls[@current_roll_index + 2].to_i
+  end
+
+  def next_roll_points
+    @rolls[@current_roll_index + 2].to_i
+  end
+
   def strike?
-    @rolls[@current_roll_index] == MAX_FRAME_POINTS
+    @rolls[@current_roll_index] == STRIKE_POINTS
   end
 
   def spare?
-    @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i == MAX_FRAME_POINTS
+    knocked_down_pins_points == SPARE_POINTS
   end
 
   def number_of_rolls
-    @rolls.take(NUM_OF_FRAMES).size
+    @rolls.take(MAX_NUM_OF_FRAMES).size
   end
 
 end
