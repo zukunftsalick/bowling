@@ -1,61 +1,43 @@
 class Bowling
-  MAX_NUM_OF_FRAMES = MAX_POINTS_PER_FRAME = SPARE_POINTS = STRIKE_POINTS = 10
-  attr_accessor :rolls
+  MAX_NUM_OF_FRAMES = 10
+  attr_accessor :frames
 
-  def initialize
-    @current_roll_index = 0
-    @rolls = []
+  def frames=(frames)
+    @frames = FrameParser.new(frames).parse
   end
 
   def score
-    number_of_rolls.times.inject(0) do |sum|
-      if strike?
-        sum += calculate_strike_points
-      elsif spare?
-        sum += calculate_spare_points
+    sum = 0
+    return 0 unless @frames
+    @frames.take(MAX_NUM_OF_FRAMES).each_with_index do |frame, index|
+      if frame.strike?
+        sum += calculate_strike_points(index)
+      elsif frame.spare?
+        sum += Frame::SPARE_POINTS + (@frames[index + 1] ? @frames[index + 1].score : 0)
       else
-        sum += knocked_down_pins_points
+        sum += frame.score
       end
     end
+    sum
   end
 
   private
 
-  def calculate_spare_points
-    points = SPARE_POINTS + next_roll_points
-    @current_roll_index += 2
-    points
+  def calculate_strike_points(index)
+    if @frames[index + 1].strike?
+      Frame::STRIKE_POINTS + two_next_frames_points(index)
+    else
+      Frame::STRIKE_POINTS + next_frame_points(index)
+    end
   end
 
-  def calculate_strike_points
-    points = STRIKE_POINTS + next_two_rolls_points
-    @current_roll_index += 1
-    points
+  def two_next_frames_points(index)
+    sum = 0
+    sum += next_frame_points(index)
+    sum + (@frames[index + 2] ? @frames[index + 2].score : 0)
   end
 
-  def knocked_down_pins_points(change_index: true)
-    points = @rolls[@current_roll_index].to_i + @rolls[@current_roll_index + 1].to_i
-    @current_roll_index += 2 if change_index
-    points
-  end
-
-  def next_two_rolls_points
-    @rolls[@current_roll_index + 1].to_i + @rolls[@current_roll_index + 2].to_i
-  end
-
-  def next_roll_points
-    @rolls[@current_roll_index + 2].to_i
-  end
-
-  def strike?
-    @rolls[@current_roll_index] == STRIKE_POINTS
-  end
-
-  def spare?
-    knocked_down_pins_points(change_index: false) == SPARE_POINTS
-  end
-
-  def number_of_rolls
-    @rolls.take(MAX_NUM_OF_FRAMES).size
+  def next_frame_points(index)
+    (@frames[index + 1] ? @frames[index + 1].score : 0)
   end
 end
